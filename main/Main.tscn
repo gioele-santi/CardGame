@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://main/Main.gd" type="Script" id=1]
+[ext_resource path="res://card/Card.tscn" type="PackedScene" id=2]
+
+[node name="Main" type="Node"]
+script = ExtResource( 1 )
+Card = ExtResource( 2 )
+
+[node name="Cards" type="Node" parent="."]
+
+[node name="FlipTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="MatchTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+[connection signal="timeout" from="FlipTimer" to="." method="_on_FlipTimer_timeout"]
+[connection signal="timeout" from="MatchTimer" to="." method="_on_MatchTimer_timeout"]
