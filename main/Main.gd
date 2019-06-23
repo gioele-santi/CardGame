@@ -43,13 +43,14 @@ func place_card(type: Vector2, pos: int):
 	var c = Card.instance()
 	c.start(type, false)
 	$Cards.add_child(c)
-	c.connect('card_turn', self, 'turned_card')
+	c.connect('card_turn_up', self, 'turned_up_card')
+	c.connect('card_turn_down', self, 'turned_down_card')
 	var row = int(pos / cols)
 	var col = pos % cols
 	c.scale = Vector2(scale, scale)
 	c.position = Vector2(offset.x*col+80, offset.y*row+105)
 
-func turned_card(card: Card):
+func turned_up_card(card: Card):
 	if first_card != null:
 		second_card = card
 		#block flipping to avoid errors
@@ -61,6 +62,10 @@ func turned_card(card: Card):
 			$FlipTimer.start()
 	else:
 		first_card = card
+
+func turned_down_card(card: Card):
+	first_card = null
+	second_card = null
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

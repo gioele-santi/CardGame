@@ -30,9 +30,21 @@ texture = ExtResource( 3 )
 vframes = 5
 hframes = 3
 
-[node name="FlipSound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource( 4 )
-volume_db = 0.6
+[node name="Flip" type="Node" parent="."]
 
-[node name="FlipBF" type="Tween" parent="."]
+[node name="Sound" type="AudioStreamPlayer" parent="Flip"]
+stream = ExtResource( 4 )
+volume_db = 0.4
+
+[node name="BackFront1" type="Tween" parent="Flip"]
+
+[node name="BackFront2" type="Tween" parent="Flip"]
+
+[node name="FrontBack1" type="Tween" parent="Flip"]
+
+[node name="FrontBack2" type="Tween" parent="Flip"]
 [connection signal="input_event" from="." to="." method="_on_Card_input_event"]
+[connection signal="tween_completed" from="Flip/BackFront1" to="." method="_flip_half_tween_completed"]
+[connection signal="tween_completed" from="Flip/BackFront2" to="." method="_flip_tween_completed"]
+[connection signal="tween_completed" from="Flip/FrontBack1" to="." method="_flip_half_tween_completed"]
+[connection signal="tween_completed" from="Flip/FrontBack2" to="." method="_flip_tween_completed"]
