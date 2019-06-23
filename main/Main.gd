@@ -5,23 +5,32 @@ export (PackedScene) var Card
 #I want to add a style to associate other meanings to card, so provide a fixed couple
 
 #cards disposition
-var scale = 0.6
-var offset = Vector2(160*scale, 210*scale) #help with position, then calculate dinamically
-var screen_size
+var scale = 0.6 #scale for the cards
+var top_left = Vector2(80, 85) #first position offset
+var offset = Vector2(160*scale, 210*scale) #space from center to center of cards
 var rows = 4
-var cols = 10
+var cols = 10 #keep space for interface
 var cards = rows * cols
 
 #game 'state' check
+var current_player = 0
+export (int) var player_count = 2
+var combo_count = 1
+var player_score = []
 var first_card: Card
 var second_card: Card
 
 func _ready():
 	randomize() #set random seed for this session
-	screen_size = get_viewport().get_visible_rect().size
 	start_new_game()
 
+func _process(delta):
+	if $Cards.get_children().size() == 0:
+		print("Game over")
+		#go back to main screen, check points, save record....
+
 func start_new_game():
+	# card shuffle
 	var available_pos = range(cards)
 	var usedCards = []
 	#must also divide positions in rows according to total number
@@ -38,6 +47,12 @@ func start_new_game():
 			var pos = available_pos[idx]
 			place_card(ctype, pos)
 			available_pos.remove(idx)
+	
+	#set up player(s)
+	$HUD.set_player_number(player_count)
+	$HUD.select_player(current_player)
+	for i in range(player_count):
+		player_score.append(0)
 
 func place_card(type: Vector2, pos: int):
 	var c = Card.instance()
@@ -48,7 +63,7 @@ func place_card(type: Vector2, pos: int):
 	var row = int(pos / cols)
 	var col = pos % cols
 	c.scale = Vector2(scale, scale)
-	c.position = Vector2(offset.x*col+80, offset.y*row+105)
+	c.position = Vector2(offset.x*col+top_left.x, offset.y*row+top_left.y) 
 
 func turned_up_card(card: Card):
 	if first_card != null:
@@ -64,27 +79,34 @@ func turned_up_card(card: Card):
 		first_card = card
 
 func turned_down_card(card: Card):
+	reset()
+
+func reset():
 	first_card = null
 	second_card = null
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
-
+	for c in $Cards.get_children():
+		c.can_flip = true
 
 func _on_FlipTimer_timeout():
 	first_card.flip()
 	second_card.flip()
-	first_card = null
-	second_card = null
-	for c in $Cards.get_children():
-			c.can_flip = true
+	combo_count = 1 #reset value
+	current_player = (current_player +1) % player_count
+	$HUD.select_player(current_player)
+	reset()
 
 func _on_MatchTimer_timeout():
 	#TODO: add score mgmt
+	$Move1.interpolate_property(first_card, 'position', first_card.position, $HUD.player_position(current_player), 0.8, Tween.TRANS_QUAD, Tween.EASE_IN_OUT)
+	$Move2.interpolate_property(second_card, 'position', second_card.position, $HUD.player_position(current_player), 0.9, Tween.TRANS_QUAD, Tween.EASE_IN_OUT)
+	$Move1.start()
+	$Move2.start()
+	#move this part to tween complete (problem, they are two)
+	yield($Move1, "tween_completed")
+	yield($Move2, "tween_completed")
 	first_card.queue_free()
 	second_card.queue_free()
-	first_card = null
-	second_card = null
-	for c in $Cards.get_children():
-			c.can_flip = true
+	player_score[current_player] += 5 * combo_count
+	combo_count += 1 #add combo mgmt
+	$HUD.update_score(current_player, player_score[current_player])
+	reset()
