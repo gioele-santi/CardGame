@@ -3,7 +3,7 @@
 [ext_resource path="res://card/Card.gd" type="Script" id=1]
 [ext_resource path="res://assets/playingCards.png" type="Texture" id=2]
 [ext_resource path="res://assets/playingCardBacks.png" type="Texture" id=3]
-[ext_resource path="res://assets/Audio/cardSlide1.ogg" type="AudioStream" id=4]
+[ext_resource path="res://assets/Audio/cardPlace3.ogg" type="AudioStream" id=4]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 70, 95 )
@@ -34,7 +34,7 @@ hframes = 3
 
 [node name="Sound" type="AudioStreamPlayer" parent="Flip"]
 stream = ExtResource( 4 )
-volume_db = 0.4
+volume_db = 0.2
 
 [node name="Begin" type="Tween" parent="Flip"]
 

@@ -48,6 +48,7 @@ func flip()-> void:
 	$Flip/Begin.start()
 
 func _on_Flip_Begin_tween_completed(object, key):
+	$Flip/Sound.play()
 	var upface: Sprite = $Front if face_up else $Back
 	var downface: Sprite = $Front if !face_up else $Back
 	upface.visible = !upface.visible
@@ -59,7 +60,7 @@ func _on_Flip_Begin_tween_completed(object, key):
 	face_up = ! face_up #finally invert orientation
 
 func _on_Flip_End_tween_completed(object, key):
-	$Flip/Sound.play()
+	
 	can_flip = true #enable again flipping
 	if face_up:
 		emit_signal("card_turn_up", self)
