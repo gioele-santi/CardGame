@@ -8,11 +8,12 @@ export (PackedScene) var Card
 var scale = 0.6 #scale for the cards
 var top_left = Vector2(80, 85) #first position offset
 var offset = Vector2(160*scale, 210*scale) #space from center to center of cards
-var rows = 4
-var cols = 10 #keep space for interface
+var rows = 3 #4
+var cols = 4#10 #keep space for interface
 var cards = rows * cols
 
 #game 'state' check
+var playing = false
 var current_player = 0
 export (int) var player_count = 2
 var combo_count = 1
@@ -25,8 +26,15 @@ func _ready():
 	start_new_game()
 
 func _process(delta):
-	if $Cards.get_children().size() == 0:
-		print("Game over")
+	if $Cards.get_children().size() == 0 && playing:
+		playing = false 
+		var max_score = 0
+		var winner = -1
+		for i in range(player_count):
+			if player_score[i] > max_score:
+				max_score = player_score[i]
+				winner = i
+		print("Game over: Player %d wins with %d points." % [winner+1, max_score])
 		#go back to main screen, check points, save record....
 
 func start_new_game():
@@ -53,6 +61,7 @@ func start_new_game():
 	$HUD.select_player(current_player)
 	for i in range(player_count):
 		player_score.append(0)
+	playing = true
 
 func place_card(type: Vector2, pos: int):
 	var c = Card.instance()

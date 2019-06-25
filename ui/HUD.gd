@@ -11,7 +11,6 @@ func reset():
 	for i in range(4):
 		var container: MarginContainer = $HBoxContainer.get_child(i)
 		container.visible = false
-	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -22,14 +21,15 @@ func player_position(player: int) -> Vector2:
 	return container.rect_global_position + container.rect_size/2
 	#return Vector2()
 
-
 func select_player(player_number: int):
 	#it does not stay fixed
 	for i in range(4):
-		$HBoxContainer.get_child(i).margin_top = -15 if i == player_number else 0
+		var alpha = 1 if i == player_number else 0.5
+		var container: MarginContainer = $HBoxContainer.get_child(i)
 
 func update_score(player: int, score: int):
 	playerLbl[player].text = "P%d: %05d" % [player+1, score]
+
 
 func set_player_number(count: int):
 	var player_count = int(clamp(count, 1, 4))
