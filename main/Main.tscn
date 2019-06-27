@@ -25,3 +25,6 @@ one_shot = true
 [node name="Move2" type="Tween" parent="."]
 [connection signal="timeout" from="FlipTimer" to="." method="_on_FlipTimer_timeout"]
 [connection signal="timeout" from="MatchTimer" to="." method="_on_MatchTimer_timeout"]
+[connection signal="pressed" from="HUD/HBoxContainer/MarginContainer/ExitBtn" to="." method="_on_ExitBtn_pressed"]
+
+[editable path="HUD"]

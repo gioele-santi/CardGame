@@ -4,18 +4,10 @@ export (PackedScene) var Card
 
 #I want to add a style to associate other meanings to card, so provide a fixed couple
 
-#cards disposition
-var scale = 0.6 #scale for the cards
-var top_left = Vector2(80, 85) #first position offset
-var offset = Vector2(160*scale, 210*scale) #space from center to center of cards
-var rows = 3 #4
-var cols = 4#10 #keep space for interface
-var cards = rows * cols
-
 #game 'state' check
 var playing = false
 var current_player = 0
-export (int) var player_count = 2
+var player_count
 var combo_count = 1
 var player_score = []
 var first_card: Card
@@ -23,6 +15,7 @@ var second_card: Card
 
 func _ready():
 	randomize() #set random seed for this session
+	player_count = Global.player_count
 	start_new_game()
 
 func _process(delta):
@@ -33,13 +26,15 @@ func _process(delta):
 		for i in range(player_count):
 			if player_score[i] > max_score:
 				max_score = player_score[i]
-				winner = i
-		print("Game over: Player %d wins with %d points." % [winner+1, max_score])
+				winner = i+1
+		print("Game over: Player %d wins with %d points." % [winner, max_score])
+		$HUD.game_over_panel(winner, max_score)
+		#get_tree().change_scene("res://ui/Start.tscn")
 		#go back to main screen, check points, save record....
 
 func start_new_game():
 	# card shuffle
-	var available_pos = range(cards)
+	var available_pos = range(Global.card_count)
 	var usedCards = []
 	#must also divide positions in rows according to total number
 	while available_pos.size() > 0: #probably it will generate an error as it will be modified
@@ -69,10 +64,10 @@ func place_card(type: Vector2, pos: int):
 	$Cards.add_child(c)
 	c.connect('card_turn_up', self, 'turned_up_card')
 	c.connect('card_turn_down', self, 'turned_down_card')
-	var row = int(pos / cols)
-	var col = pos % cols
-	c.scale = Vector2(scale, scale)
-	c.position = Vector2(offset.x*col+top_left.x, offset.y*row+top_left.y) 
+	var row = int(pos / Global.cols)
+	var col = pos % Global.cols
+	c.scale = Vector2(Global.scale, Global.scale)
+	c.position = Vector2(Global.offset.x*col+Global.top_left.x, Global.offset.y*row+Global.top_left.y) 
 
 func turned_up_card(card: Card):
 	if first_card != null:
@@ -119,3 +114,7 @@ func _on_MatchTimer_timeout():
 	combo_count += 1 #add combo mgmt
 	$HUD.update_score(current_player, player_score[current_player])
 	reset()
+
+
+func _on_ExitBtn_pressed():
+	get_tree().change_scene("res://ui/Start.tscn")
